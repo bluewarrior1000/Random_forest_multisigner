@@ -1,0 +1,17 @@
+%script to remove padding from images
+opts.video_num          = 22;
+opts.numclasses         = 8;
+opts.windowwidth        = 71;
+opts.forest.numtrees    = 8;
+opts.stdimgwidth        = 360;          %standard width of input images (already scaled)
+opts.stdimgheight       = 203;          %standard height of input images (already scaled)
+opts.padding            = ceil(opts.windowwidth/2);
+opts.boundingbox        = [180+opts.padding,40+opts.padding,opts.stdimgwidth-180,opts.stdimgheight-40];    %bounding box of signer [X, Y, WIDTH, HEIGHT]
+opts.imgwidth           = opts.stdimgwidth + 2*opts.padding;
+opts.imgheight          = opts.stdimgheight + 2*opts.padding;
+    
+load(sprintf('/nobackup/scsjc/testing/multi_signer/frames/colourmodel_tomas/video%d/images.mat',opts.video_num));
+datax = (opts.padding+1):(opts.padding+opts.stdimgwidth);
+datay = (opts.padding+1):(opts.padding+opts.stdimgheight);
+images = images(datay,datax,:,:);
+save(sprintf('/nobackup/scsjc/testing/multi_signer/frames/colourmodel_tomas/video%d/images.mat',opts.video_num),'-v7.3','images');

@@ -1,0 +1,41 @@
+%test tomases templates
+init_options_colourmodel_22;
+
+%script to store frames of video for training (so as not to rely on
+%avisynth)
+addpath('../random_forest/')
+
+video_path = sprintf('%s/video%d/%s',opts.video_dir,opts.video_num,opts.video_filename);
+%compute colour histogram for skin and body from reference image
+
+%load tomas templates
+load('videoToColor_v2.mat')
+% colour_hist{3} = smooth_normalise_hist(opts, mre_rgbhistogram(I,opts.colourhist.bits,Mbg));
+
+ref.face = [];
+ref.torso = [];
+for template_id = 1:numel(videoToColor{opts.video_num})
+    if (~isempty(videoToColor{opts.video_num}(template_id).face))
+        ref.face = [ref.face; videoToColor{opts.video_num}(template_id).face(:)];
+        ref.torso = [ref.torso; videoToColor{opts.video_num}(template_id).face(:)];    
+    end
+end
+MBf = ones(size(ref.face,1),size(ref.face,2)).*(sum(ref.face,3)~=0);
+MBt = ones(size(ref.torso,1),size(ref.torso,2)).*(sum(ref.torso,3)~=0);
+ref.face = uint8(ref.face);
+ref.torso = uint8(ref.torso);
+colour_hist{1} = smooth_normalise_hist(opts,mre_rgbhistogram(ref.face,opts.colourhist.bits,MBf));
+colour_hist{2} = smooth_normalise_hist(opts,mre_rgbhistogram(ref.torso,opts.colourhist.bits,MBt));
+for i = 1:length(opts.trainingset)
+    %load images
+    I=mre_avifile(video_path,opts.trainingset(i)-1);
+    I=mre_resizebilinear(I,opts.stdimgheight,opts.stdimgwidth,true);
+    %add padding
+    I = padarray(I,[opts.padding, opts.padding, 0],'symmetric','both');
+    %compute background histogram
+    I = uint8(compute_posterior(opts,I,colour_hist)*255);
+    imagesc(I); axis image
+    pause(0.2);
+    drawnow
+%     imwrite(I,sprintf('./for_tomas/video%d/img%04.0f.png',opts.video_num,opts.trainingset(i)-1));
+end

@@ -1,0 +1,31 @@
+% LAB
+%------------
+%script to store frames of video for training (so as not to rely on
+%avisynth)
+addpath('../random_forest/')
+addpath('../training/')
+
+init_options_lab_61;
+
+video_path = sprintf('%s/video%d/%s',opts.video_dir,opts.video_num,opts.video_filename);
+images = repmat(uint8(0),[opts.imgheight, opts.imgwidth, 3, length(opts.trainingset)]);
+
+for i = 1:length(opts.testingset)
+    %load images
+    I=mre_avifile(video_path,opts.testingset(i)-1);
+    I=mre_resizebilinear(I,opts.stdimgheight,opts.stdimgwidth,true);
+    
+    %convert to LAB
+    I = RGB2Lab(I);
+    I(:,:,1) = uint8(round(255*(I(:,:,1)/100)));
+    I(:,:,2:3) = uint8(round(((I(:,:,2:3) + 100)/200)*255));
+    I = uint8(I);
+    %add padding
+    I = padarray(I,[opts.padding, opts.padding, 0],'symmetric','both');
+    %compute background histogram
+    images(:,:,:,i) = I;
+end
+
+save(sprintf('./frames/lab/video%d/images.mat',opts.video_num),'-v7.3','images');
+save(sprintf('./frames/lab/video%d/trainingset.mat',opts.video_num),'opts');
+

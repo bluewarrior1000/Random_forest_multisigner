@@ -1,0 +1,69 @@
+%script to evaluate the performance of the single signer forests
+testtype = {'colourmodel_tomas','silhouette','tomas','lab'};
+type_str = {'Color Posterior','Silhouette','Seg + Color Posterior','LAB'};
+short_str = {'CP','S','Seg + CP','LAB'};
+
+reorder = [4 1 2 3];
+
+testvideo = [22 47 59 61 62];
+testdist = 0:20;
+
+%fixed parameters
+eval_opts.results_dir = './results/';
+eval_opts.treedepth = 64;
+eval_opts.windowwidth = 91;
+eval_opts.numtrees = [];
+
+P = zeros(numel(testdist),7);
+eval_opts.video_type = testtype{3};
+
+for d = 1:numel(testdist)
+    eval_opts.thresh_dist = testdist(d);
+    score = 0;
+    for v = 1:numel(testvideo)
+        eval_opts.video_num = testvideo(v);
+        score = score + get_score(eval_opts);
+    end
+    P(d,:) = score/numel(testvideo);
+end
+
+
+%fixed parameters
+eval_opts.results_dir = '../testing_1signer/results/';
+eval_opts.treedepth = 64;
+eval_opts.windowwidth = 91;
+eval_opts.numtrees = [];
+
+Ps = zeros(numel(testdist),7);
+eval_opts.video_type = testtype{3};
+
+for d = 1:numel(testdist)
+    eval_opts.thresh_dist = testdist(d);
+    score = 0;
+    for v = 1:numel(testvideo)
+        eval_opts.video_num = testvideo(v);
+        score = score + get_score_single_signer(eval_opts);
+    end
+    Ps(d,:) = score/numel(testvideo);
+end
+
+title_srt = {'Head','Right wrist','Left wrist'
+for f = 1:7
+    figure
+    plot(testdist,P(:,f),'b-','linewidth',3);
+    hold on
+    plot(testdist,Ps(:,f),'r--','linewidth',3);
+    grid on
+    tidx = find(P(:,f)>=0.9,1,'first');
+    if ~isempty(tidx)
+        plot([testdist(tidx),testdist(tidx)],[0, P(tidx,f)],'b--','linewidth',2)
+    end
+    
+    tidx = find(Ps(:,f)>=0.9,1,'first');
+    if ~isempty(tidx)
+        plot([testdist(tidx),testdist(tidx)],[0, Ps(tidx,f)],'r--','linewidth',2)
+    end
+    
+end
+
+

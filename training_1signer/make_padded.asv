@@ -1,0 +1,11 @@
+%make images with padding
+init_options_colourmodel_22_save;
+
+w = [31 51 71 91];
+
+
+I = load(sprintf('%svideo%d/images.mat',opts.frames_dir,opts.video_num));
+for i = 1:numel(w)
+    opts.windowwidth = w(i);
+    images = padarray(I.images,
+end

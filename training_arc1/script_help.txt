@@ -1,0 +1,44 @@
+script.csh
+
+# Run in current working directory and export all variables
+#$ -wd /home/ufaserv1_i/scsjc/training/ -V -e /nobackup/scsjc/joboutput/ -o /nobackup/scsjc/joboutput/
+# Set a 6 hour limit
+#$ -l h_rt=7:00:00
+# Setup the task array
+#$ -t 1:20
+# Stack setting?
+#$ -l h_stack=10M
+#$ -l h_vmem=3000M
+unset DISPLAY
+#export MCR_CACHE_ROOT=$TMPDIR
+./deployment/mcc_wrapper ${SGE_TASK_ID}
+
+---------------------------------------------------------------
+
+
+phd_eccv/make
+
+#!/bin/bash
+matlab -nojvm -nosplash -nodesktop -r "make;exit" -c /home/ufaserv1_i/scsjc/.matlab/R2009b/licenses/research
+
+---------------------------------------------------------------
+
+
+
+
+
+phd_eccv/make.m
+
+mcc -R -singleCompThread -v -m mcc_wrapper -a './util/circstats' -a './eval' -a './util' -a './model' -a './hog' -a './training' -a 
+'./util/libocas_v093' -d deployment
+
+---------------------------------------------------------------
+
+phd_eccv/mcc_wrapper.m
+
+function mcc_wrapper(sarg)
+s = str2double(sarg);
+fprintf('Setting s to %02.0f and running...\n',s)
+mcc_test;
+exit;
+

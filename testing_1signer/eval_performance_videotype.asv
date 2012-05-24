@@ -1,0 +1,61 @@
+%script to evaluate the performance of the single signer forests
+testtype = {'colourmodel_tomas','silhouette','tomas','lab'};
+type_str = {'Color Posterior','Silhouette','Seg + Color Posterior','LAB'};
+testvideo = [22 47 59 61 62];
+testdist = 0:20;
+
+%fixed parameters
+eval_opts.results_dir = './results/';
+eval_opts.treedepth = 64;
+eval_opts.windowwidth = 91;
+
+P = zeros(numel(testtype),numel(testdist));
+T = zeros(numel(testtype),7);
+
+for t = 1:numel(testtype)
+    eval_opts.video_type = testtype{t};
+    for d = 1:numel(testdist)
+        eval_opts.thresh_dist = testdist(d);
+        score = 0;
+        for v = 1:numel(testvideo)
+            eval_opts.video_num = testvideo(v);
+            score = score + get_score(eval_opts);
+        end
+        P(t,d) = sum(score)/(numel(testvideo)*7);       
+        if testdist(d)==6
+            T(t,:) = score;
+        end
+    end
+end
+
+figure
+clr = lines(numel(testtype));
+leg_str = 'legend(';
+for t = 1:numel(testtype)
+    plot(testdist,P(t,:),'b-','color',clr(t,:));
+    hold on
+    if t == numel(testtype)
+        leg_str = sprintf('%s''%s''',leg_str,type_str{t});
+    else
+        leg_str = sprintf('%s''%s'',',leg_str,type_str{t});
+    end
+end
+leg_str = sprintf('%s,''location'',''East'');',leg_str);
+eval(leg_str)
+
+%create table
+table_str = '\\begin{tabular}{c*{9}{@{\\hspace{10pt}}c}}\n\\hline\nMethod & Head & R wrist & L wrist & R elbow & L elbow & R shder & L shlder & Average\n\\\hline';
+
+T = cat(2,T,mean(T(
+for t = 1:numel(testtype)
+    for j = 1:8
+end
+% CP        & 99.0 & 77.2 & 73.7 & 72.6 & 92.6 & 90.8 & 96.7 & 86.1\\\\\
+% Seg+CP & 99.8 & 82.5 & 78.1 & 78.0 & 93.3 & 95.1 & 97.4 & 89.2 \\\\\\
+% \hline
+% \end{tabular}'
+
+
+
+
+

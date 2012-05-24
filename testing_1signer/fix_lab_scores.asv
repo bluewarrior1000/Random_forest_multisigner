@@ -1,0 +1,23 @@
+%correct lab scores
+for vn = [22 47 59 61 62]
+    for tree_d
+    opts.video_num          = vn;
+    opts.numclasses         = 8;
+    opts.windowwidth        = 71;
+    opts.forest.maxdepth    = td;
+    opts.forest.numtrees    = 8;
+    opts.stdimgwidth        = 360;          %standard width of input images (already scaled)
+    opts.stdimgheight       = 203;          %standard height of input images (already scaled)
+    opts.padding            = ceil(opts.windowwidth/2);
+    opts.boundingbox        = [180+opts.padding,40+opts.padding,opts.stdimgwidth-180,opts.stdimgheight-40];    %bounding box of signer [X, Y, WIDTH, HEIGHT]
+    opts.imgwidth           = opts.stdimgwidth + 2*opts.padding;
+    opts.imgheight          = opts.stdimgheight + 2*opts.padding;
+    
+    opts.frames_dir         = sprintf('/nobackup/scsjc/testing/one_signer/frames/%s/',vt);
+    opts.forest_dir         = sprintf('/nobackup/scsjc/one_signer/forests/%s/',vt);
+    opts.data_dir           = '/nobackup/scsjc/data/';
+
+    opts.results_dir        = sprintf('/nobackup/scsjc/testing/one_signer/results/%s/',vt);
+
+    dist_thresh = 0:20;
+end

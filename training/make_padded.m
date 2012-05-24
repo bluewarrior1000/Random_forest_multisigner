@@ -1,0 +1,15 @@
+%make images with padding
+init_options_colourmodel_22;
+opts.frames_dir         = './frames/silhouette/';
+
+w = [91];
+
+
+I = load(sprintf('%svideo%d/images.mat',opts.frames_dir,opts.video_num));
+for i = 1:numel(w)
+    opts.windowwidth = w(i);
+    opts.padding            = ceil(opts.windowwidth/2);
+    images = padarray(I.images,[opts.padding, opts.padding, 0],'symmetric','both');
+    save(sprintf('%svideo%d/images%d.mat',opts.frames_dir,opts.video_num,w(i)),'images');
+    clear 'images';
+end
