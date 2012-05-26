@@ -61,7 +61,7 @@ for i = 1:numel(testingset)
     handle = plot_skeleton(results.pred_joints(:,:,i),opts1,handle);
     handle2 = plot_skeleton(gt(:,:,i),opts2,handle2);
     drawnow
-    pause(0.8);
+    pause(1);
 end
 
 
