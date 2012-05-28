@@ -1,14 +1,14 @@
 %function analyse the failure modes for tracking a single signer
 
-video_num = [22 47 59 60 61];
+video_num = [22 47 59 61 62];
 results_dir = '../../Saved_data/forest_results/single_signer/results/';
 frames_dir = '../../Video_database/Signing/extracted_frames/single_signer/testing/frames/';
 data_dir = '../../Video_database/Signing/Data/';
 video_type = {'colourmodel_tomas','lab','silhouette','tomas'};
 window_width = [31 51 71 91];
 tree_depth = [8 16 32 64 128];
-VN = 3;
-VT = 1;
+VN = 4;
+VT = 3;
 WW = 1;
 TD = 4;
 BAD_THRESH = 10;
@@ -41,11 +41,16 @@ opts.P(1,:,:)=opts.P(1,:,:)*3+offset(1,video_num(VN));
 opts.P(2,:,:)=opts.P(2,:,:)*3+offset(2,video_num(VN));
 opts.P=double(opts.P);
 opts.joints = round((opts.P-1)*0.5 + 1);
-gt = opts.joints(:,:,testingset);
+pgt = opts.joints(:,:,testingset);
+
+% %load manual ground truth
+% gt = load(sprintf('%sjoint_annotation_videoNr%d.mat',data_dir,video_num(VN)));
+% gt = gt.andata.joints;
 
 %test to visualise all frame
 handle = [];
 handle2 = [];
+
 opts1.clr = jet(9);
 opts1.linewidth = 5;
 opts1.jointsize = 10;
@@ -54,12 +59,21 @@ opts2.clr = ones(9,3);
 opts2.linewidth = 3;
 opts2.jointsize = 5;
 
-img_handle = imagesc(images(:,:,:,1)); axis image
+if VT ~= 3
+    img_handle = imagesc(images(:,:,:,1)); axis image
+else
+    img_handle = imagesc(images(:,:,1)); axis image
+end
+
 for i = 1:numel(testingset)
-    set(img_handle,'cdata',images(:,:,:,i)); axis image
+    if VT ~= 3
+        set(img_handle,'cdata',images(:,:,:,i)); axis image
+    else
+        set(img_handle,'cdata',images(:,:,i)); axis image
+    end
     hold on
     handle = plot_skeleton(results.pred_joints(:,:,i),opts1,handle);
-    handle2 = plot_skeleton(gt(:,:,i),opts2,handle2);
+    handle2 = plot_skeleton(pgt(:,:,i),opts2,handle2);
     drawnow
     pause(1);
 end
