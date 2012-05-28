@@ -44,11 +44,11 @@ end
 
 %load in images from video
 video_path = sprintf('%s/video%d/%s',opts.video_dir,opts.video_num,opts.video_filename);
-images = repmat(uint8(0),[opts.stdimgheight,opts.stdimgwidth,3,opts.seg.numposeclusters]);
+video_obj = open_video_avsf(video_path);
 for c = 1:opts.seg.numposeclusters
-    I=mre_avifile(video_path,andata.frameidx(c)-1);
-	images(:,:,:,c)=mre_resizebilinear(I,opts.stdimgheight,opts.stdimgwidth,true);
+    images(:,:,:,c) = read_video_avsf(video_obj,andata.frameidx(c)-1,[opts.stdimgheight,opts.stdimgwidth]);
 end
+close_video_avsf(video_obj);
 
 %get current frame to annotate
 andata.current = find(andata.completed==0,1,'first');
