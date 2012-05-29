@@ -38,4 +38,11 @@ function show_annotation(handle)
     for l = 1:4
         set(handle.line{l},'xdata',ldata(1,:,l),'ydata',ldata(2,:,l))
     end
+    
+    %show patricks output if toggled
+    if andata.pat.toggled == true
+        plot_skeleton(andata.pat.joints(:,:,andata.frameidx(andata.current)),handle.pat.opts,handle.pat.plot_handle);
+    else
+        plot_skeleton(zeros(2,7),handle.pat.opts,handle.pat.plot_handle);
+    end
 end

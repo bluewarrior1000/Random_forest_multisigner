@@ -71,6 +71,15 @@ for l = 1:4
     handle.line{l} = plot([0,0],[0,0],'b-','color',andata.jclr(l,:),'linewidth',5);
 end
 
+%initialise handle for patricks output
+handle.pat.opts.clr = ones(9,3);
+handle.pat.opts.linewidth = 3;
+handle.pat.opts.jointsize = 5;
+andata.pat.joints = opts.joints;
+andata.pat.toggled = false;
+
+handle.pat.plot_handle = plot_skeleton(zeros(2,7),handle.pat.opts,[]);
+
 handle.title = title(sprintf('frame %d of %d',andata.current,opts.seg.numposeclusters));
 handle.btn_next = uicontrol('Style', 'pushbutton', 'String', 'Next',...
         'Position', [70 20 50 20],...
@@ -81,6 +90,9 @@ handle.btn_prev = uicontrol('Style', 'pushbutton', 'String', 'Prev',...
 handle.btn_prev = uicontrol('Style', 'pushbutton', 'String', 'Start',...
     'Position', [20 40 50 20],...
     'Callback',{@start_annotation,handle,images});
+handle.btn_tog_pat = uicontrol('Style', 'pushbutton', 'String', sprintf('Toggle\nPatrick'),...
+    'Position', [70 40 50 20],...
+    'Callback',{@show_hide_patrick,handle});
 set(handle.fig,'KeyPressFcn',{@start_annotation,handle,images});
 
 %display image

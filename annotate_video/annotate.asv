@@ -1,27 +1,12 @@
 %annotation tool for annotating joints in video
 function annotate(opts,f_idx)
 global andata;
-global joints;
-global handle;
 
 %load in joint annotations if present
 data_filename = sprintf('%sjoint_annotation_videoNr%d.mat','',opts.video_num);
 if exist(data_filename,'file')
     andata = load(data_filename);
     andata = andata.andata;
-    joints = opts.joints;
-    %normalise pose
-%     joints2 = bsxfun(@minus,joints,joints(:,1,:));
-%     joints2 = reshape(joints2,14,length(opts.testingset));
-%     
-%     %do clustering
-%     andata1.centroids = vgg_kmeans(joints2,opts.seg.numposeclusters,'verbose',0);
-%     andata1.joints = zeros(2,7,opts.seg.numposeclusters);
-%     %find poses closest to cluster centroids
-%     andata1.frameidx = zeros(1,opts.seg.numposeclusters);
-%     [c_idx, c_dist] = vgg_nearest_neighbour(joints2,andata1.centroids);
-%     joints = joints(:,:,c_idx);
-    
 else
 %setup data
     joints = opts.joints(:,:,opts.testingset);
@@ -56,14 +41,11 @@ else
 %     andata.joints = opts.joints(:,:,andata.frameidx);
     andata.jclr = jet(7);
 end
-handle.handle = [];
+
 %load in images from video
 video_path = sprintf('%s/video%d/%s',opts.video_dir,opts.video_num,opts.video_filename);
-images = repmat(uint8(0),[opts.stdimgheight,opts.stdimgwidth,3,opts.seg.numposeclusters]);
 video_obj = open_video_avsf(video_path);
 for c = 1:opts.seg.numposeclusters
-%     I=mre_avifile(video_path,andata.frameidx(c)-1);
-% 	images(:,:,:,c)=mre_resizebilinear(I,opts.stdimgheight,opts.stdimgwidth,true);
     images(:,:,:,c) = read_video_avsf(video_obj,andata.frameidx(c)-1,[opts.stdimgheight,opts.stdimgwidth]);
 end
 close_video_avsf(video_obj);
@@ -89,7 +71,14 @@ for l = 1:4
     handle.line{l} = plot([0,0],[0,0],'b-','color',andata.jclr(l,:),'linewidth',5);
 end
 
+%initialise handle for patricks output
+handle.pat.opts.clr = ones(9,3);
+handle.pat.linewidth = 3;
+handle.pat.jointsize = 5;
+andata.pat.joints = opts.joints;
+andata.pat.
 
+handle.pat.plot_handle = plot_skeleton([0 0 0 0 0 0 0; 0 0 0 0 0 0 0],handle.pat.opts,[]);
 
 handle.title = title(sprintf('frame %d of %d',andata.current,opts.seg.numposeclusters));
 handle.btn_next = uicontrol('Style', 'pushbutton', 'String', 'Next',...
@@ -101,6 +90,9 @@ handle.btn_prev = uicontrol('Style', 'pushbutton', 'String', 'Prev',...
 handle.btn_prev = uicontrol('Style', 'pushbutton', 'String', 'Start',...
     'Position', [20 40 50 20],...
     'Callback',{@start_annotation,handle,images});
+handle.btn_tog_pat = uicontrol('Style', 'pushbutton', 'String', sprintf('Toggle\nPatrick'),...
+    'Position', [70 40 50 20],...
+    'Callback',{@show_hide_patrick,handle,images});
 set(handle.fig,'KeyPressFcn',{@start_annotation,handle,images});
 
 %display image
