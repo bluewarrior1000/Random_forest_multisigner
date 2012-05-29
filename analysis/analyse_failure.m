@@ -7,11 +7,12 @@ data_dir = '../../Video_database/Signing/Data/';
 video_type = {'colourmodel_tomas','lab','silhouette','tomas'};
 window_width = [31 51 71 91];
 tree_depth = [8 16 32 64 128];
-VN = 4;
-VT = 3;
+VN = 1;
+VT = 1;
 WW = 1;
 TD = 4;
-BAD_THRESH = 10;
+JOINT = 3;
+BAD_THRESH = 5;
 %load estimated joints and their distance (L2) from ground truth
 results = load(sprintf('%s%s/video%d/pred_joints_width_%d_depth_%d.mat',...
     results_dir,video_type{VT},video_num(VN),window_width(WW),...
@@ -19,6 +20,7 @@ results = load(sprintf('%s%s/video%d/pred_joints_width_%d_depth_%d.mat',...
 
 %locate bad joint estimates - we do this per joint
 bad_idx = results.dist_frm_GT > BAD_THRESH;
+bad_idx = find(bad_idx(:,JOINT));
 
 %visuals frames with bad joint estimates
 images = load(sprintf('%s%s/video%d/images.mat',frames_dir,video_type{VT},video_num(VN)));
@@ -43,10 +45,6 @@ opts.P=double(opts.P);
 opts.joints = round((opts.P-1)*0.5 + 1);
 pgt = opts.joints(:,:,testingset);
 
-% %load manual ground truth
-% gt = load(sprintf('%sjoint_annotation_videoNr%d.mat',data_dir,video_num(VN)));
-% gt = gt.andata.joints;
-
 %test to visualise all frame
 handle = [];
 handle2 = [];
@@ -65,15 +63,15 @@ else
     img_handle = imagesc(images(:,:,1)); axis image
 end
 
-for i = 1:numel(testingset)
+for i = 1:numel(bad_idx)
     if VT ~= 3
-        set(img_handle,'cdata',images(:,:,:,i)); axis image
+        set(img_handle,'cdata',images(:,:,:,bad_idx(i))); axis image
     else
-        set(img_handle,'cdata',images(:,:,i)); axis image
+        set(img_handle,'cdata',images(:,:,bad_idx(i))); axis image
     end
     hold on
-    handle = plot_skeleton(results.pred_joints(:,:,i),opts1,handle);
-    handle2 = plot_skeleton(pgt(:,:,i),opts2,handle2);
+    handle = plot_skeleton(results.pred_joints(:,:,bad_idx(i)),opts1,handle);
+    handle2 = plot_skeleton(pgt(:,:,bad_idx(i)),opts2,handle2);
     drawnow
     pause(1);
 end
