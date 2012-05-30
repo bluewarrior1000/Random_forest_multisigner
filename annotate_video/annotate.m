@@ -9,12 +9,9 @@ if exist(data_filename,'file')
     andata = andata.andata;
 else
 %setup data
-    idx_greater = find(size(opts.joints,3)<=opts.testingset,1,'first');
-    if isempty(idx_greater)
-        opts.testingset = opts.testingset;
-    else
-        opts.testingset = opts.testingset(1:idx_greater);
-    end
+    %remove from testingset those frames that dont have GT joints
+    id_remove = opts.testingset>size(opts.joints,3);
+    opts.testingset(id_remove) = [];
     
     joints = opts.joints(:,:,opts.testingset);
     %normalise pose
