@@ -2,7 +2,7 @@
 opts.stdimgwidth        = 720;          %standard width of input images (already scaled)
 opts.stdimgheight       = 405;          %standard height of input images (already scaled)
 opts.video_filename     = 'x.avs';
-opts.video_num          = 61;
+opts.video_num          = 62;
 opts.video_dir          = '../../Video_database/Signing/Videos/';
 opts.data_dir           = '../../Video_database/Signing/Data/';
 opts.frames_dir         = '../../Video_database/Signing/extracted_frames/single_signer/testing/frames/tomas/';
